@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>やさしい食事サポート（パーソナル向け）</title>
+  <style>
+    :root{
+      --bg1:#fff7fb;
+      --bg2:#f3fbff;
+      --card:#ffffffcc;
+      --text:#243042;
+      --muted:#6b778c;
+      --line:#e9e5f0;
+      --accent:#7aa7ff;
+      --accent2:#ff9db8;
+      --ok:#38b77a;
+      --warn:#f3a63b;
+      --shadow: 0 10px 30px rgba(31, 41, 55, .10);
+      --radius: 18px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Segoe UI", Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 10% 10%, rgba(255,157,184,.20), transparent 60%),
+        radial-gradient(900px 500px at 90% 30%, rgba(122,167,255,.18), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+      padding:22px;
+    }
+
+    .wrap{
+      max-width:980px;
+      margin:0 auto;
+      display:grid;
+      gap:16px;
+      grid-template-columns: 1.15fr .85fr;
+    }
+
+    @media (max-width: 980px){
+      .wrap{grid-template-columns: 1fr; padding-bottom:32px;}
+    }
+
+    header{
+      grid-column: 1 / -1;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 6px;
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:20px;
+      letter-spacing:.02em;
+    }
+    .brand p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.6;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.65);
+      border-radius:999px;
+      box-shadow: 0 6px 20px rgba(31, 41, 55, .06);
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .card .hd{
+      padding:16px 16px 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      border-bottom:1px solid rgba(233,229,240,.8);
+    }
+    .hd h2{
+      margin:0;
+      font-size:16px;
+    }
+    .hd small{
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .card .bd{
+      padding:14px 16px 16px;
+    }
+
+    .grid{display:grid; gap:12px;}
+
+    .goals{
+      display:grid;
+      gap:10px;
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 520px){
+      .goals{grid-template-columns: 1fr;}
+    }
+
+    .goal{
+      cursor:pointer;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.72);
+      border-radius:16px;
+      padding:14px 14px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      position:relative;
+      outline:none;
+    }
+    .goal:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 14px 40px rgba(31,41,55,.10);
+      border-color: rgba(122,167,255,.45);
+    }
+    .goal[aria-checked="true"]{
+      border-color: rgba(122,167,255,.9);
+      box-shadow: 0 16px 50px rgba(122,167,255,.12);
+    }
+    .goal .icon{
+      width:38px; height:38px;
+      border-radius:14px;
+      display:grid; place-items:center;
+      background: linear-gradient(135deg, rgba(122,167,255,.25), rgba(255,157,184,.22));
+      border:1px solid rgba(233,229,240,.9);
+      flex:0 0 auto;
+      font-size:18px;
+    }
+    .goal .t{
+      margin:0;
+      font-weight:700;
+      font-size:14px;
+      line-height:1.35;
+    }
+    .goal .d{
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.55;
+    }
+    .goal .check{
+      position:absolute;
+      top:10px; right:10px;
+      width:22px; height:22px;
+      border-radius:999px;
+      border:1px solid rgba(233,229,240,.9);
+      background:rgba(255,255,255,.75);
+      display:grid; place-items:center;
+      font-size:13px;
+      color:transparent;
+      transition: .12s ease;
+    }
+    .goal[aria-checked="true"] .check{
+      color:#fff;
+      border-color: rgba(122,167,255,.95);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+    }
+
+    .row{
+      display:grid;
+      gap:10px;
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 520px){
+      .row{grid-template-columns: 1fr;}
+    }
+
+    .field{display:grid; gap:6px;}
+    label{font-size:12px; color:var(--muted);}
+
+    input[type="text"], select{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.82);
+      outline:none;
+      font-size:14px;
+      color:var(--text);
+      transition: border-color .12s ease, box-shadow .12s ease;
+    }
+    input:focus, select:focus{
+      border-color: rgba(122,167,255,.9);
+      box-shadow: 0 0 0 4px rgba(122,167,255,.14);
+    }
+
+    .seg{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .seg button{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.78);
+      padding:10px 12px;
+      border-radius: 999px;
+      cursor:pointer;
+      color:var(--text);
+      font-size:13px;
+      transition:.12s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+    }
+    .seg button:hover{ transform: translateY(-1px); }
+    .seg button[aria-pressed="true"]{
+      border-color: rgba(122,167,255,.9);
+      box-shadow: 0 10px 30px rgba(122,167,255,.12);
+      background: linear-gradient(135deg, rgba(122,167,255,.20), rgba(255,157,184,.16));
+    }
+
+    .photoBox{
+      display:grid;
+      gap:10px;
+      border:1px dashed rgba(122,167,255,.55);
+      border-radius:16px;
+      padding:12px;
+      background: rgba(255,255,255,.55);
+    }
+    .photoTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .preview{
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .thumb{
+      width:72px; height:72px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.65);
+      overflow:hidden;
+      display:grid; place-items:center;
+      flex:0 0 auto;
+    }
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+    .thumb .ph{color:var(--muted);font-size:12px;}
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+      padding-top:8px;
+    }
+
+    .btn{
+      border:none;
+      padding:12px 14px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight:700;
+      font-size:14px;
+      transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+    }
+    .btn:hover{ transform: translateY(-1px); }
+    .btn:active{ transform: translateY(0px); opacity:.95; }
+
+    .btn.primary{
+      color:white;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 16px 50px rgba(122,167,255,.18);
+    }
+    .btn.ghost{
+      background: rgba(255,255,255,.72);
+      border:1px solid var(--line);
+      color:var(--text);
+    }
+    .btn.small{
+      padding:10px 12px;
+      border-radius: 999px;
+      font-size:13px;
+      font-weight:650;
+    }
+
+    .hint{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.65;
+      margin:10px 0 0;
+    }
+
+    .result{display:grid; gap:12px;}
+
+    .kpi{
+      display:grid;
+      gap:10px;
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 520px){
+      .kpi{grid-template-columns: 1fr;}
+    }
+
+    .k{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px 12px;
+      background: rgba(255,255,255,.75);
+    }
+    .k .lab{font-size:12px;color:var(--muted);}
+    .k .val{margin-top:6px;font-size:18px;font-weight:800;letter-spacing:.01em;}
+    .k .sub{margin-top:2px;font-size:12px;color:var(--muted);}
+
+    .bubble{
+      border:1px solid var(--line);
+      border-radius: 18px;
+      padding:14px 14px;
+      background: rgba(255,255,255,.78);
+    }
+    .bubble h3{margin:0 0 8px;font-size:14px;}
+    .bubble ul{margin:0;padding-left:18px;line-height:1.75;font-size:13px;}
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.70);
+      color:var(--muted);
+    }
+    .statusDot{width:10px;height:10px;border-radius:999px;background: var(--warn);}
+
+    .log{
+      border-top:1px dashed rgba(233,229,240,.9);
+      margin-top:10px;
+      padding-top:10px;
+      display:grid;
+      gap:8px;
+    }
+    .entry{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background: rgba(255,255,255,.70);
+      padding:10px 12px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+    }
+    .entry .meta{display:grid;gap:2px;}
+    .entry .meta strong{font-size:13px;}
+    .entry .meta span{font-size:12px;color:var(--muted);}
+    .pill{
+      font-size:12px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.76);
+      white-space:nowrap;
+    }
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <h1>やさしい食事サポート</h1>
+        <p>目標を選ぶだけで、今日の食事の“次にやること”が決まる。トレーナー向け・会員向けどちらでも使えるミニ管理アプリ。</p>
+      </div>
+      <div class="chip" id="todayChip">🗓️ 今日：—</div>
+    </header>
+
+    <section class="card">
+      <div class="hd">
+        <div>
+          <h2>1) 目標を選ぶ</h2>
+          <small>最初に1つだけ。迷わせない設計。</small>
+        </div>
+        <span class="badge"><span class="statusDot" id="goalDot"></span><span id="goalStatus">未選択</span></span>
+      </div>
+
+      <div class="bd grid">
+        <div class="goals" id="goalGrid" role="radiogroup" aria-label="目標選択"></div>
+
+        <div class="card" style="box-shadow:none; border-radius:16px; background:rgba(255,255,255,.55);">
+          <div class="hd" style="border-bottom:none;">
+            <div>
+              <h2 style="font-size:15px;">2) 今日の入力</h2>
+              <small>写真 or かんたん選択。続く設計。</small>
+            </div>
+            <button class="btn ghost small" id="resetBtn" type="button">↺ リセット</button>
+          </div>
+
+          <div class="bd grid" style="padding-top:0;">
+            <div class="row">
+              <div class="field">
+                <label>食事タイミング</label>
+                <div class="seg" id="mealSeg">
+                  <button type="button" data-meal="朝" aria-pressed="true">🌤️ 朝</button>
+                  <button type="button" data-meal="昼" aria-pressed="false">☀️ 昼</button>
+                  <button type="button" data-meal="夜" aria-pressed="false">🌙 夜</button>
+                  <button type="button" data-meal="間食" aria-pressed="false">🍪 間食</button>
+                </div>
+              </div>
+
+              <div class="field">
+                <label>量の目安（補正）</label>
+                <select id="portion">
+                  <option value="0.85">少なめ</option>
+                  <option value="1" selected>ふつう</option>
+                  <option value="1.2">多め</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>いちばん困ってること（1つ）</label>
+              <div class="seg" id="issueSeg">
+                <button type="button" data-issue="夜に食べすぎる" aria-pressed="false">🌙 夜多め</button>
+                <button type="button" data-issue="間食が止まらない" aria-pressed="false">🍫 間食多め</button>
+                <button type="button" data-issue="外食が多い" aria-pressed="false">🍜 外食多め</button>
+                <button type="button" data-issue="時間がなくて適当になる" aria-pressed="false">⏱️ 時間ない</button>
+              </div>
+            </div>
+
+            <div class="photoBox">
+              <div class="photoTop">
+                <div class="preview">
+                  <div class="thumb" id="thumb">
+                    <div class="ph">写真なし</div>
+                  </div>
+                  <div>
+                    <div style="font-weight:750; font-size:13px;">食事写真（任意）</div>
+                    <small class="muted">※このHTMLはデモ版です。写真からの自動推定は未実装（記録＋アドバイス生成まで）。</small>
+                  </div>
+                </div>
+
+                <label class="btn ghost small" style="cursor:pointer;">
+                  📷 アップロード
+                  <input id="photo" type="file" accept="image/*" style="display:none;">
+                </label>
+              </div>
+
+              <div class="row">
+                <div class="field">
+                  <label>食事内容（ざっくりでOK）</label>
+                  <input id="mealText" type="text" placeholder="例：鶏むね＋サラダ＋味噌汁、パスタ、コンビニおにぎり など">
+                </div>
+
+                <div class="field">
+                  <label>選択（よくあるメニュー）</label>
+                  <select id="quickMenu">
+                    <option value="">選択しない</option>
+                    <option value="定食（ごはん＋主菜＋副菜）">定食（ごはん＋主菜＋副菜）</option>
+                    <option value="丼（牛丼・親子丼など）">丼（牛丼・親子丼など）</option>
+                    <option value="麺（ラーメン・パスタなど）">麺（ラーメン・パスタなど）</option>
+                    <option value="サラダ＋たんぱく（チキン等）">サラダ＋たんぱく（チキン等）</option>
+                    <option value="コンビニ（おにぎり＋サラダチキン等）">コンビニ（おにぎり＋サラダチキン等）</option>
+                    <option value="間食（菓子・甘い飲み物）">間食（菓子・甘い飲み物）</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="actions">
+                <button class="btn ghost" id="saveBtn" type="button">📝 記録する</button>
+                <button class="btn primary" id="advBtn" type="button">✨ 今日のアドバイスを作る</button>
+              </div>
+
+              <p class="hint" id="hintText">目標を選ぶ → 今日の入力 → 「今日のアドバイスを作る」でOK。</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <aside class="card">
+      <div class="hd">
+        <div>
+          <h2>今日のアドバイス</h2>
+          <small>目標に合わせて“次にやる1つ”を提示。</small>
+        </div>
+        <span class="badge"><span class="statusDot" id="advDot"></span><span id="advStatus">未生成</span></span>
+      </div>
+
+      <div class="bd result">
+        <div class="kpi">
+          <div class="k">
+            <div class="lab">選択中の目標</div>
+            <div class="val" id="kGoal">—</div>
+            <div class="sub" id="kGoalSub">まずは目標を1つ選びましょう</div>
+          </div>
+          <div class="k">
+            <div class="lab">今回の食事</div>
+            <div class="val" id="kMeal">—</div>
+            <div class="sub" id="kMealSub">タイミング・量・内容を入れると精度UP</div>
+          </div>
+        </div>
+
+        <div class="bubble">
+          <h3>✅ 良かった点</h3>
+          <ul id="goodList"><li class="muted">まだデータがありません。</li></ul>
+        </div>
+
+        <div class="bubble">
+          <h3>🎯 次にやること（1つ）</h3>
+          <ul id="nextList"><li class="muted">目標を選んで「今日のアドバイス」を作りましょう。</li></ul>
+        </div>
+
+        <div class="bubble">
+          <h3>🍽️ 次の食事の提案</h3>
+          <ul id="menuList"><li class="muted">提案がここに出ます。</li></ul>
+        </div>
+
+        <div class="bubble">
+          <h3>📚 今日のログ（ローカル）</h3>
+          <div class="log" id="log"></div>
+          <p class="hint">※ブラウザの localStorage に保存します。</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    const GOALS = [
+      { id:"cut",   icon:"🔥", title:"体脂肪を落として引き締めたい", desc:"無理な制限より、夜の整え＆タンパク質優先。" },
+      { id:"shape", icon:"✨", title:"体重はそのままで見た目を整えたい", desc:"PFCとタイミングで“整う”方向へ。" },
+      { id:"gain",  icon:"💪", title:"筋肉をつけてメリハリを出したい", desc:"不足させない。トレ前後の食事がカギ。" },
+      { id:"energy",icon:"🌿", title:"疲れにくい体になりたい", desc:"血糖安定＆鉄・ビタミンを意識。" },
+      { id:"habit", icon:"🫶", title:"リバウンドしない習慣を作りたい", desc:"完璧をやめて“続く形”に寄せる。" },
+    ];
+
+    const STORAGE_KEY = "gentle_food_support_v1";
+
+    const state = {
+      goalId: null,
+      mealTime: "朝",
+      portion: 1,
+      issue: null,
+      mealText: "",
+      quickMenu: "",
+      photoDataUrl: null,
+      logs: []
+    };
+
+    const $ = (sel) => document.querySelector(sel);
+
+    function setTodayChip(){
+      const d = new Date();
+      const s = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+      $("#todayChip").textContent = `🗓️ 今日：${s}`;
+    }
+
+    function saveStorage(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+    function loadStorage(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return;
+      try{ Object.assign(state, JSON.parse(raw)); }catch(e){ console.warn(e); }
+    }
+
+    function goalById(id){ return GOALS.find(g => g.id === id); }
+
+    function niceMealSummary(){
+      const base = state.mealText || state.quickMenu || "（未入力）";
+      const portionLabel = state.portion < 1 ? "少なめ" : (state.portion > 1 ? "多め" : "ふつう");
+      const issue = state.issue ? ` / 悩み：${state.issue}` : "";
+      return `${state.mealTime}・${portionLabel}・${base}${issue}`;
+    }
+
+    function renderGoals(){
+      const grid = $("#goalGrid");
+      grid.innerHTML = "";
+      GOALS.forEach(g => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "goal";
+        btn.setAttribute("role","radio");
+        btn.setAttribute("aria-checked", String(state.goalId === g.id));
+        btn.dataset.goalId = g.id;
+
+        btn.innerHTML = `
+          <div class="icon">${g.icon}</div>
+          <div>
+            <p class="t">${g.title}</p>
+            <p class="d">${g.desc}</p>
+          </div>
+          <div class="check">✓</div>
+        `;
+
+        btn.addEventListener("click", () => {
+          state.goalId = g.id;
+          renderAll();
+          saveStorage();
+        });
+
+        grid.appendChild(btn);
+      });
+    }
+
+    function renderThumb(){
+      const thumb = $("#thumb");
+      if(state.photoDataUrl){
+        thumb.innerHTML = `<img alt="食事写真" src="${state.photoDataUrl}">`;
+      }else{
+        thumb.innerHTML = `<div class="ph">写真なし</div>`;
+      }
+    }
+
+    function renderKpis(){
+      const g = state.goalId ? goalById(state.goalId) : null;
+
+      $("#kGoal").textContent = g ? g.title : "—";
+      $("#kGoalSub").textContent = g ? g.desc : "まずは目標を1つ選びましょう";
+
+      $("#kMeal").textContent = state.mealTime || "—";
+      $("#kMealSub").textContent = (state.mealText || state.quickMenu) ? niceMealSummary() : "タイミング・量・内容を入れると精度UP";
+
+      const goalOk = !!state.goalId;
+      $("#goalDot").style.background = goalOk ? "var(--ok)" : "var(--warn)";
+      $("#goalStatus").textContent = goalOk ? "選択済み" : "未選択";
+    }
+
+    function renderSegButtons(containerSel, key){
+      const wrap = $(containerSel);
+      wrap.querySelectorAll("button").forEach(b => {
+        const val = b.dataset[key];
+        const pressed = (key === "meal") ? (state.mealTime === val) : (state.issue === val);
+        b.setAttribute("aria-pressed", String(pressed));
+      });
+    }
+
+    function renderLog(){
+      const el = $("#log");
+      el.innerHTML = "";
+      if(!state.logs.length){
+        el.innerHTML = `<div class="muted" style="font-size:13px;">まだ記録がありません。</div>`;
+        return;
+      }
+      state.logs.slice().reverse().forEach(item => {
+        const div = document.createElement("div");
+        div.className = "entry";
+        div.innerHTML = `
+          <div class="meta">
+            <strong>${item.mealTime}（${item.time}）</strong>
+            <span>${item.summary}</span>
+          </div>
+          <span class="pill">${item.goalTitle}</span>
+        `;
+        el.appendChild(div);
+      });
+    }
+
+    function buildAdvice(){
+      const g = goalById(state.goalId);
+      const mealBase = state.mealText || state.quickMenu || "";
+      const portion = Number(state.portion || 1);
+      const issue = state.issue || "";
+
+      const good = [];
+      if(mealBase){
+        good.push("記録できたのが最高。続けるほど精度が上がります。");
+      } else {
+        good.push("今日は“入力だけ”でもOK。習慣化がいちばん大事。");
+      }
+      if(state.mealTime === "朝") good.push("朝に意識が向いているのは強いです。");
+      if(state.mealTime === "夜") good.push("夜を整えると見た目が変わりやすいです。");
+      if(issue) good.push(`困りごとを1つに絞れています（${issue}）。`);
+
+      let next = "次の食事で「たんぱく質」を1品足す。";
+      let menu = [];
+
+      if(g.id === "cut"){
+        if(state.mealTime === "夜" || issue.includes("夜")){
+          next = "次の夜は「主食を半分」＋「汁物」を足す。";
+        } else {
+          next = "次の食事は「手のひら分のたんぱく質」を最優先。";
+        }
+        menu = [
+          "鶏むね or 魚 + サラダ + 味噌汁",
+          "ごはんは少なめ（または半分）",
+          "間食はヨーグルト/チーズ/プロテインに置き換え"
+        ];
+      }
+
+      if(g.id === "shape"){
+        next = "次の食事は「主食・主菜・副菜」をそろえる。";
+        menu = [
+          "ごはん + たんぱく（魚/卵/豆腐） + 野菜/きのこ",
+          "夜だけ極端に抜かない（むくみやすくなります）",
+          "水分＋塩分バランス：汁物はOK、濃すぎ注意"
+        ];
+      }
+
+      if(g.id === "gain"){
+        next = "次の食事は「炭水化物＋たんぱく質」をセットで。";
+        menu = [
+          "おにぎり + サラダチキン + バナナ",
+          "トレ後：白米/うどん + 肉/魚/卵",
+          "不足しがちなら間食にプロテイン＋果物"
+        ];
+      }
+
+      if(g.id === "energy"){
+        next = "次の食事は「血糖が乱れにくい組み合わせ」にする。";
+        menu = [
+          "主食はOK：ただし先に汁物/野菜 → 主菜 → 主食",
+          "鉄：赤身肉/あさり/小松菜、ビタミンCも一緒に",
+          "甘い飲み物の代わりに無糖ラテ/お茶/炭酸水"
+        ];
+      }
+
+      if(g.id === "habit"){
+        next = "次の食事は「80点でOKルール」で決め打ちにする。";
+        menu = [
+          "固定メニューを作る：例）朝＝プロテイン＋果物＋味噌汁",
+          "外食の日は“1つだけ”調整（ごはん少なめ等）",
+          "完璧より継続：週単位で整えれば大丈夫"
+        ];
+      }
+
+      if(issue.includes("間食")){
+        menu.unshift("間食は“たんぱく質系”を先に：ゆで卵/ヨーグルト/チーズ");
+      }
+      if(issue.includes("外食")){
+        menu.unshift("外食は「主菜（肉/魚）＋汁物」優先、丼/麺は頻度を下げる");
+      }
+      if(issue.includes("時間")){
+        menu.unshift("時間がない日は「固定セット」を用意：おにぎり＋サラダチキン＋カット野菜");
+      }
+
+      if(portion > 1.05 && (g.id === "cut" || g.id === "shape")){
+        next = "次の食事は「主食を少しだけ減らして」タンパク質を足す。";
+      }
+      if(portion < 0.95 && g.id === "gain"){
+        next = "次の食事は「主食を1つ増やす（おにぎり等）」を追加。";
+      }
+
+      return { good, next: [next], menu };
+    }
+
+    function setList(sel, arr){
+      const ul = $(sel);
+      ul.innerHTML = "";
+      arr.forEach(t => {
+        const li = document.createElement("li");
+        li.textContent = t;
+        ul.appendChild(li);
+      });
+    }
+
+    function renderAll(){
+      renderGoals();
+      renderThumb();
+      renderKpis();
+      renderSegButtons("#mealSeg","meal");
+      renderSegButtons("#issueSeg","issue");
+      $("#portion").value = String(state.portion || 1);
+      $("#mealText").value = state.mealText || "";
+      $("#quickMenu").value = state.quickMenu || "";
+      renderLog();
+    }
+
+    function bindEvents(){
+      $("#mealSeg").addEventListener("click", (e) => {
+        const b = e.target.closest("button");
+        if(!b) return;
+        state.mealTime = b.dataset.meal;
+        renderAll(); saveStorage();
+      });
+
+      $("#issueSeg").addEventListener("click", (e) => {
+        const b = e.target.closest("button");
+        if(!b) return;
+        const val = b.dataset.issue;
+        state.issue = (state.issue === val) ? null : val;
+        renderAll(); saveStorage();
+      });
+
+      $("#portion").addEventListener("change", (e) => {
+        state.portion = Number(e.target.value);
+        renderAll(); saveStorage();
+      });
+
+      $("#mealText").addEventListener("input", (e) => {
+        state.mealText = e.target.value;
+        saveStorage();
+      });
+
+      $("#quickMenu").addEventListener("change", (e) => {
+        state.quickMenu = e.target.value;
+        if(state.quickMenu && !state.mealText){
+          state.mealText = state.quickMenu;
+          $("#mealText").value = state.mealText;
+        }
+        saveStorage();
+        renderAll();
+      });
+
+      $("#photo").addEventListener("change", (e) => {
+        const file = e.target.files && e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          state.photoDataUrl = reader.result;
+          saveStorage();
+          renderAll();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      $("#saveBtn").addEventListener("click", () => {
+        if(!state.goalId){
+          alert("先に目標を1つ選んでください。");
+          return;
+        }
+        const g = goalById(state.goalId);
+        const now = new Date();
+        const time = `${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+        const summary = niceMealSummary();
+
+        state.logs.push({
+          time,
+          mealTime: state.mealTime,
+          summary,
+          goalTitle: g.title
+        });
+
+        saveStorage();
+        renderAll();
+        $("#hintText").textContent = "記録できました。次は「今日のアドバイス」を作るだけ。";
+      });
+
+      $("#advBtn").addEventListener("click", () => {
+        if(!state.goalId){
+          alert("先に目標を1つ選んでください。");
+          return;
+        }
+        const adv = buildAdvice();
+
+        setList("#goodList", adv.good);
+        setList("#nextList", adv.next);
+        setList("#menuList", adv.menu);
+
+        $("#advStatus").textContent = "生成済み";
+        $("#advDot").style.background = "var(--ok)";
+        $("#hintText").textContent = "OK。次の食事で“やること1つ”だけ実行しましょう。";
+      });
+
+      $("#resetBtn").addEventListener("click", () => {
+        if(!confirm("入力とログをリセットしますか？（ローカル保存も消えます）")) return;
+
+        localStorage.removeItem(STORAGE_KEY);
+        state.goalId = null;
+        state.mealTime = "朝";
+        state.portion = 1;
+        state.issue = null;
+        state.mealText = "";
+        state.quickMenu = "";
+        state.photoDataUrl = null;
+        state.logs = [];
+
+        $("#advStatus").textContent = "未生成";
+        $("#advDot").style.background = "var(--warn)";
+        setList("#goodList", ["まだデータがありません。"]);
+        setList("#nextList", ["目標を選んで「今日のアドバイス」を作りましょう。"]);
+        setList("#menuList", ["提案がここに出ます。"]);
+
+        renderAll();
+        $("#hintText").textContent = "リセットしました。目標を選ぶところからどうぞ。";
+      });
+    }
+
+    setTodayChip();
+    loadStorage();
+    bindEvents();
+    renderAll();
+  </script>
+</body>
+</html>
