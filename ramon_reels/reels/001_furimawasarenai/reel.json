@@ -1,0 +1,42 @@
+{
+  "id": "001_furimawasarenai",
+  "memo": "リール第1号（試作）。文章・背景・音楽はこのファイルだけ書き換えれば差し替えられます。",
+
+  "title_lines": ["人に振り回されなくなる", "7つの心得"],
+
+  "items": [
+    "他人の機嫌まで背負うな",
+    "嫌な誘いは断っていい",
+    "陰口には加わるな",
+    "返事を急ぐ必要はない",
+    "無理に笑うな",
+    "全員に好かれようとするな",
+    "自分の人生を後回しにするな"
+  ],
+
+  "closing_lines": ["優しさと我慢を、履き違えるな。", "己の道を。"],
+
+  "signature": "カイザー羅門",
+
+  "duration_sec": 20,
+  "fps": 30,
+
+  "background": {
+    "type": "procedural",
+    "file": null,
+    "motion": "zoom_in",
+    "seed": 7
+  },
+
+  "bgm": {
+    "file": null,
+    "volume": 0.6,
+    "fade_in_sec": 1.5,
+    "fade_out_sec": 2.0
+  },
+
+  "cover": {
+    "columns": ["人に振り回されない", "7つの心得"],
+    "accent_column": 1
+  }
+}
