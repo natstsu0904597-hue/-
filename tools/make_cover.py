@@ -2,9 +2,9 @@
 
 デザインの決まり
 - 背景：明るく上品な黄金色の単色（グラデーション・質感なし）
-- 中央：白の長方形（直角・影なし）
+- 中央：白の帯を上から下まで縦に通す（直角・影なし）。左右に黄金色が見える
 - 文字：縦書きの明朝体。基本は黒、強調は深紅
-- 羅門らしさ：長方形の左下に深紅の角印「羅門」、長方形の下にアカウント名
+- 羅門らしさ：文字の左下に深紅の角印「羅門」、その下にアカウント名
 - 重要な文字は、プロフィール一覧の表示範囲（3:4 / 9:16）に収める
 
 使い方
@@ -25,7 +25,7 @@ PAPER = (253, 251, 245)      # 長方形の白（真っ白より少しだけ温�
 INK = (30, 26, 24)           # 黒
 CRIMSON = (150, 22, 34)      # 深紅
 FONT = '/usr/share/fonts/opentype/noto/NotoSerifCJK-Bold.ttc'
-CARD = (130, 340, 950, 1580)  # 3:4 の一覧表示（y 240〜1680）に収まる
+CARD = (130, 340, 950, 1580)  # 文字を置く範囲。3:4 の一覧表示（y 240〜1680）に収まる
 PAD_TOP, PAD_BOTTOM = 140, 230   # 下は角印のぶん空ける
 GAP = 1.02                   # 縦方向の字間
 PITCH = 1.28                 # 行の間隔（文字サイズに対する倍率）
@@ -85,7 +85,7 @@ def seal(img, x, y, size=104):
 def make_cover(columns, out):
     img = Image.new('RGB', (W, H), GOLD)
     d = ImageDraw.Draw(img)
-    d.rectangle(CARD, fill=PAPER)
+    d.rectangle([CARD[0], 0, CARD[2], H], fill=PAPER)
     sz = sizes_for(columns)
     pitches = [s * PITCH for s in sz]
     cx = (CARD[0] + CARD[2]) / 2 + sum(pitches) / 2
